@@ -1,8 +1,10 @@
+using BlazorServerBotVision.Application.Extensions;
+using BlazorServerBotVision.Application.Interfaces;
+using BlazorServerBotVision.Infrastructure.AI;
+using BlazorServerBotVision.Infrastructure.Extensions;
+using BlazorServerBotVision.Persistence.Extensions;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
-
-using BlazorServerBotVision.Application.Extensions;
-using BlazorServerBotVision.Persistence.Extensions;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -10,6 +12,7 @@ builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 builder.Services.AddApplicationServices();
 builder.Services.AddPersistenceServices(builder.Configuration);
+builder.Services.AddInfrastructureServices();
 
 var app = builder.Build();
 
