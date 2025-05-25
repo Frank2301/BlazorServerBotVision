@@ -1,0 +1,108 @@
+# Architektur Dokumentation von BlazorServerBotVision
+
+## Überblick
+
+BlazorServerBotVision basiert auf den Prinzipien der Clean Architecture und teilt das System in mehrere unabhängige Layer auf. Diese Schichtung stellt sicher, dass sich Änderungen in einem Bereich nur minimal auf andere Bereiche auswirken, was die Skalierbarkeit, Testbarkeit und Wartbarkeit bestätigt.
+
+## Architektonische Schichten
+
+### 1. Domain
+
+- **Zweck:**  
+  Definiert die Geschäftslogik und zentrale Entitätsmodelle.
+- **Inhalt:**  
+  - **Entities:** `User`, `Chat`, `ChatHistory` und die abstrakte `BaseEntity`
+  - **Interfaces:** Vertragsdefinitionen für Repositories, z. B. `IUserRepository`
+- **Anmerkungen:**  
+  Die Domain-Schicht ist unabhängig von externen Abhängigkeiten und bildet somit den stabilen Kern des Systems.
+
+### 2. Application
+
+- **Zweck:**  
+  Implementiert die Geschäftslogik und orchestriert die einzelnen Use Cases.
+- **Inhalt:**  
+  - **Services:** Konkrete Geschäftslogik in Klassen wie `UserService`, `ChatService` und `ChatHistoryService`
+  - **DTOs:** Objekte zur Datenübertragung zwischen den Schichten (`UserDto`, `ChatDto`, etc.)
+- **Anmerkungen:**  
+  Diese Schicht vermittelt zwischen Domain und den technisch orientierten Schichten (Persistence, Infrastructure).
+
+### 3. Persistence
+
+- **Zweck:**  
+  Realisiert die Datenzugriffslogik mittels EF Core.
+- **Inhalt:**  
+  - **Database:** `ApplicationDbContext`, der auf MS SQL Server ausgerichtet ist
+  - **Migrations:** EF Core Migrations (z. B. `InitialCreateMigration`)
+  - **Repositories:** Konkrete Implementierungen der Domain Interfaces
+  - **Konfigurationen:** Einstellung von Entitäten (z. B. mittels `EntityConfiguration`)
+  - **Extensions:** Statische Erweiterungsmethoden zur DI Konfiguration
+
+- **Anmerkungen:**  
+  Diese Schicht abstrahiert die Datenbankzugriffe, sodass Änderungen an der Persistenztechnologie die übrigen Schichten minimal beeinflussen.
+
+### 4. Infrastructure
+
+- **Zweck:**  
+  Integration externer Services und Implementierung von Hilfsfunktionen.
+- **Inhalt:**  
+  - **AI-Integration:** Klassen wie `AiIntegrationService` zur Kommunikation mit AI-Diensten (Azure.AI.OpenAI oder Microsoft.Extensions.AI)
+  - **Logging:** Logging Dienste in `LoggingService`
+  - **Utilities:** Hilfsklassen (z. B. `UtilityHelper`)
+- **Anmerkungen:**  
+  Die Isolation von externen Abhängigkeiten erleichtert einen eventuellen Wechsel oder die parallele Unterstützung mehrerer Anbieter.
+
+### 5. Presentation
+
+- **Zweck:**  
+  Setzt die Anwendungsstartkonfiguration, das Routing und die DI Einstellungen um.
+- **Inhalt:**  
+  - **Startup:** Dateien wie `Program.cs` und `Startup.cs` mit statischen DI-Extension-Methoden
+  - **Routing:** Definiert das Haupt Routing in `App.razor`
+- **Anmerkungen:**  
+  Diese Schicht ist von der Business Logik getrennt, sodass UI spezifische Anpassungen ohne Eingriff in die Kernlogik möglich sind.
+
+### 6. Shared
+
+- **Zweck:**  
+  Enthält klassengemeinsame Basisimplementierungen und Utilities.
+- **Inhalt:**  
+  - Basis-Klassen, z. B. für Entities und DTOs
+  - Diverse Helper Klassen für Logging und Konfiguration
+- **Anmerkungen:**  
+  Gemeinsame Funktionalitäten werden zentral bereitgestellt, um Code Duplikationen in den einzelnen Projekten zu vermeiden.
+
+### 7. UI
+
+- **Zweck:**  
+  Implementiert die Benutzeroberfläche mittels Blazor-Komponenten.
+- **Inhalt:**  
+  - **Pages & Komponenten:** UI-Elemente wie `ChatPage.razor`, `ChatBox.razor` etc.
+  - **Services:** UI-spezifische Hilfsdienste (z. B. `UiHelperService`)
+
+- **Anmerkungen:**  
+  Durch die strikte Trennung von UI und Logik kann das Frontend unabhängig weiterentwickelt werden.
+
+
+## Projekt-Referenzen & NuGet Pakete
+
+| Projekt                           | Referenzen                                                        | Wichtige NuGet-Pakete                                               
+| --------------------------------- | ----------------------------------------------- |                  ------------------------------------------------------------------- 
+| **Domain**                        | -                                               |                  -                                                                   
+| **Application**                   | Verweist auf Domain                             |                  -                                                                   
+| **Persistence**                   | Verweist auf Domain und Application             |                  Microsoft.EntityFrameworkCore.SqlServer, Microsoft.EntityFrameworkCore.Design 
+| **Infrastructure**                | Verweist auf Domain und Application             |                  Microsoft.Extensions.Logging, Azure.AI.OpenAI (alternativ Microsoft.Extensions.AI) 
+| **Presentation**                  | Verweist auf Application, Infrastructure, Shared, Persistence    | Microsoft.AspNetCore.Components, DI-Pakete (konfiguriert via statische Extensions)  
+| **Shared**                        | -                                               |                  -                                                                   
+| **UI**                            | Verweist auf Presentation, Shared               |                  Microsoft.AspNetCore.Components, Microsoft.Extensions.Caching.Memory, Session Middleware 
+
+## Meilenstein-Strategie
+
+- **Meilenstein v1.0 - Clean Architecture:**  
+  Die erste Version fokussiert sich auf die Implementierung der Kernarchitektur (Domain, Application, Persistence) inklusive grundlegender DI Konfiguration und Datenzugriff mittels EF Core.  
+
+- **Zukünftige Meilensteine:**  
+  Weitere Funktionen wie vollständige AI Integration, Caching/Session Management, erweitertes Logging sowie Authentifizierung und Autorisierung werden schrittweise hinzugefügt und dokumentiert.
+
+## Fazit
+
+Die gewählte Architektur stellt sicher, dass Erweiterungen und Änderungen an einer Stelle minimalen Einfluss auf den Rest des Systems haben. Dies schafft eine robuste Basis für zukünftige Features und macht dein Projekt sowohl wartbar als auch skalierbar.
