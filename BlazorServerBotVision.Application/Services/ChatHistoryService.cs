@@ -28,7 +28,7 @@ namespace BlazorServerBotVision.Application.Services
                 {
                     Id = chat.Id,
                     UserId = chat.UserId,
-                    Timestamp = chat.Timestamp,
+                    Lastmodified = chat.LastModified,
                     Prompt = chat.Prompt,
                     AIResponse = chat.AIResponse,
                     DBResponse = chat.DBResponse
@@ -43,7 +43,7 @@ namespace BlazorServerBotVision.Application.Services
             var chatHistory = new ChatHistory
             {
                 UserId = chatHistoryDto.UserId,
-                Timestamp = chatHistoryDto.Timestamp,
+                LastModified = chatHistoryDto.Lastmodified,
                 Prompt = chatHistoryDto.Prompt,
                 AIResponse = chatHistoryDto.AIResponse,
                 DBResponse = chatHistoryDto.DBResponse
