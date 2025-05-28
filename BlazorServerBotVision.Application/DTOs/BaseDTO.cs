@@ -1,8 +1,7 @@
 ﻿namespace BlazorServerBotVision.Application.DTOs
-{
-    public abstract class BaseDTO
+{    public abstract class BaseDTO
     {
-        public int Id { get; set; }
-        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+        public Guid Id { get; init; } = Guid.NewGuid();
+        public DateTime CreatedAt { get; init; } = DateTime.UtcNow;
     }
 }

@@ -2,10 +2,11 @@
 {
     public class ChatHistoryDTO : BaseDTO
     {
-        public string UserId { get; set; } = string.Empty;
-        public DateTime Lastmodified { get; set; } = DateTime.UtcNow;
-        public string Prompt { get; set; } = string.Empty;
-        public string AIResponse { get; set; } = string.Empty;
-        public string DBResponse { get; set; } = string.Empty;
+        // Umgestellt von string auf Guid
+        public Guid UserId { get; init; }
+        public DateTime LastModified { get; init; } = DateTime.UtcNow;
+        public string Prompt { get; init; } = string.Empty;
+        public string AIResponse { get; init; } = string.Empty;
+        public string DBResponse { get; init; } = string.Empty;
     }
 }

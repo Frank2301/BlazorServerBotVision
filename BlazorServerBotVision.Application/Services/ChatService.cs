@@ -1,10 +1,11 @@
-﻿using BlazorServerBotVision.Application.DTOs;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using BlazorServerBotVision.Application.DTOs;
 using BlazorServerBotVision.Application.Interfaces;
 using BlazorServerBotVision.Domain.Entities;
 using BlazorServerBotVision.Domain.Interfaces;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-
 
 namespace BlazorServerBotVision.Application.Services
 {
@@ -17,26 +18,20 @@ namespace BlazorServerBotVision.Application.Services
             _chatRepository = chatRepository;
         }
 
-        public async Task<IEnumerable<ChatDTO>> GetUserChatsAsync(string userId)
+        public async Task<IEnumerable<ChatDTO>> GetUserChatsAsync(Guid userId)
         {
             var chats = await _chatRepository.GetUserChatsAsync(userId);
-            var chatDtos = new List<ChatDTO>();
-
-            foreach (var chat in chats)
+          
+            return chats.Select(chat => new ChatDTO
             {
-                chatDtos.Add(new ChatDTO
-                {
-                    Id = chat.Id,
-                    CreatedAt = chat.Timestamp,
-                    Prompt = chat.Prompt,
-                    AIResponse = chat.AIResponse
-                });
-            }
-
-            return chatDtos;
+                Id = chat.Id,
+                CreatedAt = chat.Timestamp,
+                Prompt = chat.Prompt,
+                AIResponse = chat.AIResponse
+            });
         }
 
-        public async Task SaveChatAsync(ChatDTO chatDto, string userId)
+        public async Task SaveChatAsync(ChatDTO chatDto, Guid userId)
         {
             var chat = new Chat
             {

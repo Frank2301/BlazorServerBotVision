@@ -1,16 +1,12 @@
 ﻿
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace BlazorServerBotVision.Domain.Entities
 {
     public class Chat
     {
-        public int Id { get; set; }
-        public string UserId { get; set; }
+        public Guid Id { get; set; } = Guid.NewGuid();
+        public Guid UserId { get; set; } // ehemals string, jetzt GUID
         public User User { get; set; }
         public DateTime Timestamp { get; set; } = DateTime.UtcNow;
         public string Prompt { get; set; } = string.Empty;

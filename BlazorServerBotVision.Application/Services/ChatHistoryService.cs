@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using BlazorServerBotVision.Application.DTOs;
 using BlazorServerBotVision.Application.Interfaces;
@@ -7,7 +9,6 @@ using BlazorServerBotVision.Domain.Interfaces;
 
 namespace BlazorServerBotVision.Application.Services
 {
-
     public class ChatHistoryService : IChatHistoryService
     {
         private readonly IChatHistoryRepository _chatHistoryRepository;
@@ -17,25 +18,19 @@ namespace BlazorServerBotVision.Application.Services
             _chatHistoryRepository = chatHistoryRepository;
         }
 
-        public async Task<IEnumerable<ChatHistoryDTO>> GetChatHistoryAsync(string userId)
+        public async Task<IEnumerable<ChatHistoryDTO>> GetChatHistoryAsync(Guid userId)
         {
             var chatHistories = await _chatHistoryRepository.GetChatHistoryAsync(userId);
-            var chatHistoryDtos = new List<ChatHistoryDTO>();
-
-            foreach (var chat in chatHistories)
+            // LINQ-Select zur Umwandlung in DTOs
+            return chatHistories.Select(chat => new ChatHistoryDTO
             {
-                chatHistoryDtos.Add(new ChatHistoryDTO
-                {
-                    Id = chat.Id,
-                    UserId = chat.UserId,
-                    Timestamp = chat.Timestamp,
-                    Prompt = chat.Prompt,
-                    AIResponse = chat.AIResponse,
-                    DBResponse = chat.DBResponse
-                });
-            }
-
-            return chatHistoryDtos;
+                Id = chat.Id,
+                UserId = chat.UserId,
+                LastModified = chat.LastModified,
+                Prompt = chat.Prompt,
+                AIResponse = chat.AIResponse,
+                DBResponse = chat.DBResponse
+            });
         }
 
         public async Task AddChatHistoryAsync(ChatHistoryDTO chatHistoryDto)
@@ -43,7 +38,7 @@ namespace BlazorServerBotVision.Application.Services
             var chatHistory = new ChatHistory
             {
                 UserId = chatHistoryDto.UserId,
-                Timestamp = chatHistoryDto.Timestamp,
+                LastModified = chatHistoryDto.LastModified,
                 Prompt = chatHistoryDto.Prompt,
                 AIResponse = chatHistoryDto.AIResponse,
                 DBResponse = chatHistoryDto.DBResponse

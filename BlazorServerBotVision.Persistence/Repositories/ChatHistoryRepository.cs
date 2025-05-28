@@ -3,7 +3,6 @@ using BlazorServerBotVision.Domain.Entities;
 using BlazorServerBotVision.Domain.Interfaces;
 using BlazorServerBotVision.Persistence.Database;
 
-
 namespace BlazorServerBotVision.Persistence.Repositories
 {
     public class ChatHistoryRepository : IChatHistoryRepository
@@ -15,7 +14,7 @@ namespace BlazorServerBotVision.Persistence.Repositories
             _dbContext = dbContext;
         }
 
-        public async Task<IEnumerable<ChatHistory>> GetChatHistoryAsync(string userId) =>
+        public async Task<IEnumerable<ChatHistory>> GetChatHistoryAsync(Guid userId) =>
             await _dbContext.ChatHistories.Where(ch => ch.UserId == userId).ToListAsync();
 
         public async Task AddChatHistoryAsync(ChatHistory chatHistory)

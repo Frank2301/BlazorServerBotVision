@@ -1,7 +1,6 @@
 ﻿using BlazorServerBotVision.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 
-
 namespace BlazorServerBotVision.Persistence.Database
 {
     public class ApplicationDbContext : DbContext

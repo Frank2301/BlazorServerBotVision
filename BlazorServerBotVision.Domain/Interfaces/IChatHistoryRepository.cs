@@ -5,7 +5,7 @@ namespace BlazorServerBotVision.Domain.Interfaces
 {
     public interface IChatHistoryRepository
     {
-        Task<IEnumerable<ChatHistory>> GetChatHistoryAsync(string userId);
+        Task<IEnumerable<ChatHistory>> GetChatHistoryAsync(Guid userId);
         Task AddChatHistoryAsync(ChatHistory chatHistory);
     }
 }
