@@ -21,20 +21,17 @@ namespace BlazorServerBotVision.Application.Services
         public async Task<IEnumerable<ChatHistoryDTO>> GetChatHistoryAsync(Guid userId)
         {
             var chatHistories = await _chatHistoryRepository.GetChatHistoryAsync(userId);
-            var chatHistoryDtos = new List<ChatHistoryDTO>();
-
-            foreach (var chat in chatHistories)
+          
+            return chatHistories.Select(chat => new ChatHistoryDTO
             {
-                chatHistoryDtos.Add(new ChatHistoryDTO
-                {
-                    Id = chat.Id,
-                    UserId = chat.UserId,
-                    Timestamp = chat.Timestamp,
-                    Prompt = chat.Prompt,
-                    AIResponse = chat.AIResponse,
-                    DBResponse = chat.DBResponse
-                });
-            }
+                Id = chat.Id,
+                UserId = chat.UserId,
+                LastModified = chat.LastModified,
+                Prompt = chat.Prompt,
+                AIResponse = chat.AIResponse,
+                DBResponse = chat.DBResponse
+            });
+        }
 
         public async Task AddChatHistoryAsync(ChatHistoryDTO chatHistoryDto)
         {
