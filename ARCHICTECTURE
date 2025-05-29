@@ -11,10 +11,14 @@ BlazorServerBotVision basiert auf den Prinzipien der Clean Architecture und teil
 - **Zweck:**  
   Definiert die Geschäftslogik und zentrale Entitätsmodelle.
 - **Inhalt:**  
-  - **Entities:** `User`, `Chat`, `ChatHistory` und die abstrakte `BaseEntity`
+  - **Entitäten:**  
+     - `BaseEntity`: Abstrakte Basisklasse, die ein Guid basiertes `Id` und `CreatedAt` enthält.  
+     - `User`: Enthält Informationen wie `FirstName`, `LastName`, `UserName`, `Email` sowie `PasswordHash` und hat Beziehungen zu `Chat`.  
+     - `Chat`: Enthält Felder wie `Prompt`, `AIResponse`, `DBResponse` und `IsSaved`, wobei der Fremdschlüssel `UserId` nun vom Typ Guid ist.  
+     - `ChatHistory`: Dient der Historisierung von Chat Interaktionen und verwendet ebenfalls Guid für die Identifikation und Fremdschlüssel.
   - **Interfaces:** Vertragsdefinitionen für Repositories, z. B. `IUserRepository`
 - **Anmerkungen:**  
-  Die Domain-Schicht ist unabhängig von externen Abhängigkeiten und bildet somit den stabilen Kern des Systems.
+  Die Domain Schicht ist unabhängig von externen Abhängigkeiten und bildet somit den stabilen Kern des Systems.
 
 ### 2. Application
 
@@ -34,7 +38,8 @@ BlazorServerBotVision basiert auf den Prinzipien der Clean Architecture und teil
   - **Database:** `ApplicationDbContext`, der auf MS SQL Server ausgerichtet ist
   - **Migrations:** EF Core Migrations (z. B. `InitialCreateMigration`)
   - **Repositories:** Konkrete Implementierungen der Domain Interfaces
-  - **Konfigurationen:** Einstellung von Entitäten (z. B. mittels `EntityConfiguration`)
+ - **EntityConfigurations:**  
+          Die persistente Schicht nutzt ausgelagerte Konfigurationsklassen (z. B. `UserConfiguration`, `ChatConfiguration`, `ChatHistoryConfiguration`), um das Schema mit GUIDs als Primärschlüsseln und korrekten Fremdschlüsselschlüsseln abzubilden.
   - **Extensions:** Statische Erweiterungsmethoden zur DI Konfiguration
 
 - **Anmerkungen:**  
@@ -45,20 +50,13 @@ BlazorServerBotVision basiert auf den Prinzipien der Clean Architecture und teil
 - **Zweck:**  
   Integration externer Services und Implementierung von Hilfsfunktionen.
 - **Inhalt:**  
-  - **AI-Integration:** Klassen wie `AiIntegrationService` zur Kommunikation mit AI-Diensten (Azure.AI.OpenAI oder Microsoft.Extensions.AI)
-  - **Logging:** Logging Dienste in `LoggingService`
-  - **Utilities:** Hilfsklassen (z. B. `UtilityHelper`)
+  - **AI Integration:** Klassen wie `AiIntegrationService` zur Kommunikation mit OpenAI
+
 - **Anmerkungen:**  
   Die Isolation von externen Abhängigkeiten erleichtert einen eventuellen Wechsel oder die parallele Unterstützung mehrerer Anbieter.
 
 ### 5. Presentation
 
-- **Zweck:**  
-  Setzt die Anwendungsstartkonfiguration, das Routing und die DI Einstellungen um.
-- **Inhalt:**  
-  - **Startup:** Dateien wie `Program.cs` und `Startup.cs` mit statischen DI-Extension-Methoden
-  - **Routing:** Definiert das Haupt Routing in `App.razor`
-- **Anmerkungen:**  
   Diese Schicht ist von der Business Logik getrennt, sodass UI spezifische Anpassungen ohne Eingriff in die Kernlogik möglich sind.
 
 ### 6. Shared
@@ -66,7 +64,6 @@ BlazorServerBotVision basiert auf den Prinzipien der Clean Architecture und teil
 - **Zweck:**  
   Enthält klassengemeinsame Basisimplementierungen und Utilities.
 - **Inhalt:**  
-  - Basis-Klassen, z. B. für Entities und DTOs
   - Diverse Helper Klassen für Logging und Konfiguration
 - **Anmerkungen:**  
   Gemeinsame Funktionalitäten werden zentral bereitgestellt, um Code Duplikationen in den einzelnen Projekten zu vermeiden.
@@ -74,11 +71,10 @@ BlazorServerBotVision basiert auf den Prinzipien der Clean Architecture und teil
 ### 7. UI
 
 - **Zweck:**  
-  Implementiert die Benutzeroberfläche mittels Blazor-Komponenten.
+  Implementiert die Benutzeroberfläche mittels Blazor Komponenten.
 - **Inhalt:**  
-  - **Pages & Komponenten:** UI-Elemente wie `ChatPage.razor`, `ChatBox.razor` etc.
-  - **Services:** UI-spezifische Hilfsdienste (z. B. `UiHelperService`)
-
+  - **Pages & Komponenten:** UI Elemente wie `ChatPage.razor`, `ChatBox.razor` etc.
+  
 - **Anmerkungen:**  
   Durch die strikte Trennung von UI und Logik kann das Frontend unabhängig weiterentwickelt werden.
 
@@ -97,12 +93,11 @@ BlazorServerBotVision basiert auf den Prinzipien der Clean Architecture und teil
 
 ## Meilenstein-Strategie
 
-- **Meilenstein v1.0 - Clean Architecture:**  
+- **Meilenstein v1.0 - Clean Architecture**  
   Die erste Version fokussiert sich auf die Implementierung der Kernarchitektur (Domain, Application, Persistence) inklusive grundlegender DI Konfiguration und Datenzugriff mittels EF Core.  
 
+- **Meilenstein v2.0 - AI Integration**  
+
 - **Zukünftige Meilensteine:**  
-  Weitere Funktionen wie vollständige AI Integration, Caching/Session Management, erweitertes Logging sowie Authentifizierung und Autorisierung werden schrittweise hinzugefügt und dokumentiert.
+  Weitere Funktionen wie vollständige UI, Caching/Session Management, erweitertes Logging sowie Authentifizierung und Autorisierung werden schrittweise hinzugefügt und dokumentiert.
 
-## Fazit
-
-Die gewählte Architektur stellt sicher, dass Erweiterungen und Änderungen an einer Stelle minimalen Einfluss auf den Rest des Systems haben. Dies schafft eine robuste Basis für zukünftige Features und macht dein Projekt sowohl wartbar als auch skalierbar.
