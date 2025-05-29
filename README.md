@@ -15,10 +15,11 @@
 - **Zukünftige Features:** Erweiterung um Authentication/Authorization.
 
 ## Projektstruktur
-
-- **Domain:** Enthält Kern-Entitäten (z. B. User, Chat, ChatHistory) und Schnittstellen (z. B. IUserRepository).
+- **Domain:**  
+    Beinhaltet Kern-Entitäten wie `User` (mit Basisinformationen und geerbtem `BaseEntity`), `Chat` und `ChatHistory`. Alle Entitäten nutzen GUIDs als Primärschlüssel,      um eine weltweit eindeutige Identifikation sicherzustellen.
 - **Application:** Implementiert die Geschäftslogik (Services) und enthält dazugehörige DTOs.
-- **Persistence:** Beinhaltet `ApplicationDbContext`, EF Core Migrations, Repository Implementierungen und Konfigurationen.
+- **Persistence:**  
+    Beinhaltet den `ApplicationDbContext`, EF Core Migrations sowie ausgelagerte Konfigurationsklassen (z. B. `UserConfiguration`, `ChatConfiguration`, ChatHistoryConfiguration`), die das Datenbankschema anhand der Domain Modelle definieren.
 - **Infrastructure:** Kapselt externe Service Integrationen sowie Logging und hilfreiche Utilities.
 - **Presentation:** Verantwortlich für Anwendungsstart, Routing und DI Konfiguration mittels statischer Erweiterungsmethoden.
 - **Shared:** Bietet Basis Klassen, Utilities und Konfigurationen, die in mehreren Projekten wiederverwendet werden.
@@ -29,7 +30,6 @@
 - Visual Studio 2022
 - .NET9 SDK
 - MS SQL Server
-- Die in der `architecture.md` dokumentierten NuGet Pakete
 
 ## Einrichtung und Ausführung
 
@@ -40,4 +40,4 @@
 
 ## Meilensteine
 
-Der erste Meilenstein **"Meilenstein v1.0 - Clean Architecture"** fokussiert sich auf den Aufbau der gesamten Architektur inklusive Domain, Application und Persistence. Zukünftige Meilensteine werden weitere Funktionen wie AI-Integration, Caching, Logging und Authentifizierung umfassen.
+Der erste Meilenstein **"Meilenstein v1.0 - Clean Architecture"** fokussiert sich auf den Aufbau der gesamten Architektur inklusive Domain, Application und Persistence. Der zweite Meilenstein **"Meilenstein v2.0 - AI Integration"** auf die Integratrion von OpenAI. Zukünftige Meilensteine werden weitere Funktionen, wie z.B. Caching, Logging und Authentifizierung umfassen.
