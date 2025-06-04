@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
+﻿
 namespace BlazorServerBotVision.Domain.Entities
 {
     public class User : BaseEntity

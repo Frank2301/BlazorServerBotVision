@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using BlazorServerBotVision.Application.DTOs;
+﻿using BlazorServerBotVision.Application.DTOs;
 using BlazorServerBotVision.Application.Interfaces;
 using BlazorServerBotVision.Domain.Entities;
 using BlazorServerBotVision.Domain.Interfaces;
@@ -37,7 +33,7 @@ namespace BlazorServerBotVision.Application.Services
         public async Task<IEnumerable<UserDTO>> GetAllUsersAsync()
         {
             var users = await _userRepository.GetAllAsync();
-            // Mapping der Benutzerliste mittels LINQ
+           
             return users.Select(user => new UserDTO
             {
                 Id = user.Id,
@@ -78,5 +74,34 @@ namespace BlazorServerBotVision.Application.Services
         {
             await _userRepository.DeleteAsync(id);
         }
+
+        public async Task<UserDTO> GetOrCreateDefaultUserAsync()
+        {          
+            string defaultEmail = "temp@example.com";         
+            var user = await _userRepository.GetByEmailAsync(defaultEmail);
+            if (user == null)
+            {
+                user = new User
+                {
+                    FirstName = "Temp",
+                    LastName = "User",
+                    UserName = "temp.user",
+                    Email = defaultEmail,
+                    PasswordHash = string.Empty, 
+                    CreatedAt = DateTime.UtcNow
+                };
+                await _userRepository.AddAsync(user);
+            }
+
+            return new UserDTO
+            {
+                Id = user.Id,
+                FirstName = user.FirstName,
+                LastName = user.LastName,
+                Email = user.Email,
+                CreatedAt = user.CreatedAt
+            };
+        }
+
     }
 }
