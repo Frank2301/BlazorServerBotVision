@@ -9,5 +9,8 @@ namespace BlazorServerBotVision.Application.Interfaces
         Task AddUserAsync(UserDTO userDto);
         Task UpdateUserAsync(UserDTO userDto);
         Task DeleteUserAsync(Guid id);
+
+
+        Task<UserDTO> GetOrCreateDefaultUserAsync();
     }
 }

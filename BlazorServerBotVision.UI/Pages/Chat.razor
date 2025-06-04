@@ -1,0 +1,116 @@
+﻿@page "/chat"
+@using BlazorServerBotVision.Application.DTOs
+@using BlazorServerBotVision.Application.Interfaces
+@inject IChatAIService ChatAIService
+@inject IChatDatabaseService ChatDatabaseService
+@inject IUserService UserService
+
+<h3 class="text-center">Chatbot</h3>
+
+<div class="container">
+    <div class="row">
+        <!-- Eingabebereich -->
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">Deine Frage an den Chatbot</h5>
+                    <textarea id="userPrompt" class="form-control mb-2" rows="3" @bind="userPrompt" placeholder="Gib deine Frage ein..."></textarea>
+                    <button class="btn btn-primary w-100" @onclick="SendMessage">Senden</button>
+                </div>
+            </div>
+
+            @if (!string.IsNullOrEmpty(statusMessage))
+            {
+                <div class="alert alert-info mt-3">@statusMessage</div>
+            }
+        </div>
+
+        <!-- AI & Datenbank-Antworten -->
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">AI-Antworten</h5>
+                    <ul class="list-group">
+                        @foreach (var msg in chatDTOs)
+                        {
+                            <li class="list-group-item">
+                                <strong>Prompt:</strong> @msg.Prompt <br />
+                                <strong>AI Antwort:</strong> @msg.AIResponse
+                            </li>
+                        }
+                    </ul>
+                </div>
+            </div>
+
+            <div class="card shadow-sm mt-3">
+                <div class="card-body">
+                    <h5 class="card-title">Datenbank-Ergebnisse</h5>
+                    <ul class="list-group">
+                        @foreach (var chat in chatHistoryDTOs)
+                        {
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <div>
+                                    <strong>Prompt:</strong> @chat.Prompt <br />
+                                    <strong>DB Ergebnis:</strong> @chat.DBResponse <br />
+                                    <small>Erstellt: @chat.CreatedAt.ToLocalTime()</small>
+                                </div>
+                                <button class="btn btn-danger btn-sm" @onclick="() => DeleteChat(chat.Id)">Löschen</button>
+                            </li>
+                        }
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private string userPrompt = string.Empty;
+    private string statusMessage = string.Empty;
+    private List<ChatDTO> chatDTOs = new();
+    private List<ChatHistoryDTO> chatHistoryDTOs = new();
+    private Guid currentUserId = Guid.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var user = await UserService.GetOrCreateDefaultUserAsync();
+        currentUserId = user.Id;
+    }
+
+    private async Task SendMessage()
+    {
+        if (string.IsNullOrWhiteSpace(userPrompt)) return;
+
+        try
+        {
+            var aiAnswer = await ChatAIService.GetAiGeneratedChatAsync(userPrompt);
+            var dbResult = await ChatDatabaseService.GetDatabaseResultAsync(userPrompt);
+
+            chatDTOs.Add(new ChatDTO { Prompt = userPrompt, AIResponse = aiAnswer });
+            chatHistoryDTOs.Add(new ChatHistoryDTO { UserId = currentUserId, Prompt = userPrompt, AIResponse = aiAnswer, DBResponse = dbResult });
+
+            await ChatDatabaseService.SaveChatMessageAsync(chatHistoryDTOs.Last());
+
+            statusMessage = "Nachricht gesendet!";
+            userPrompt = string.Empty;
+        }
+        catch (Exception ex)
+        {
+            statusMessage = $"Fehler: {ex.Message}";
+        }
+    }
+
+    private async Task DeleteChat(Guid chatId)
+    {
+        try
+        {
+            await ChatDatabaseService.DeleteChatMessageAsync(chatId);
+            chatHistoryDTOs.RemoveAll(c => c.Id == chatId);
+            statusMessage = "Chat-Eintrag wurde gelöscht.";
+        }
+        catch (Exception ex)
+        {
+            statusMessage = $"Fehler beim Löschen: {ex.Message}";
+        }
+    }
+}

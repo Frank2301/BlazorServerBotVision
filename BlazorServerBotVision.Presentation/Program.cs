@@ -1,15 +1,19 @@
 using BlazorServerBotVision.Application.Extensions;
-using BlazorServerBotVision.Application.Interfaces;
-using BlazorServerBotVision.Infrastructure.AI;
 using BlazorServerBotVision.Infrastructure.Extensions;
 using BlazorServerBotVision.Persistence.Extensions;
-using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Web;
+
 
 
 var builder = WebApplication.CreateBuilder(args);
+
+if (builder.Environment.IsDevelopment())
+{
+    builder.Configuration.AddUserSecrets<Program>();
+}
+
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
+
 builder.Services.AddApplicationServices();
 builder.Services.AddPersistenceServices(builder.Configuration);
 builder.Services.AddInfrastructureServices();
@@ -18,14 +22,12 @@ var app = builder.Build();
 
 if (!app.Environment.IsDevelopment())
 {
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
+    // HSTS Standardwert, ggf. an Produktionsszenarien anpassen
     app.UseHsts();
 }
 
 app.UseHttpsRedirection();
-
 app.UseStaticFiles();
-
 app.UseRouting();
 
 app.MapBlazorHub();

@@ -1,5 +1,4 @@
-﻿using System;
-
+﻿
 namespace BlazorServerBotVision.Domain.Entities
 {    public abstract class BaseEntity
     {

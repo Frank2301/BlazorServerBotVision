@@ -1,12 +1,10 @@
 ﻿
-using System;
-
 namespace BlazorServerBotVision.Domain.Entities
 {
     public class Chat
     {
         public Guid Id { get; set; } = Guid.NewGuid();
-        public Guid UserId { get; set; } // ehemals string, jetzt GUID
+        public Guid UserId { get; set; }
         public User User { get; set; }
         public DateTime Timestamp { get; set; } = DateTime.UtcNow;
         public string Prompt { get; set; } = string.Empty;

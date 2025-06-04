@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Configuration;
 using OpenAI.Chat;
 
+
 namespace BlazorServerBotVision.Infrastructure.AI
 {
     public class AiIntegrationService : IChatAIService
@@ -14,15 +15,16 @@ namespace BlazorServerBotVision.Infrastructure.AI
             if (string.IsNullOrWhiteSpace(apiKey))
                 throw new ArgumentException("Der OpenAI API Key fehlt in der Konfiguration.");
           
-            _chatClient = new ChatClient("gpt-4", apiKey);
+            _chatClient = new ChatClient("gpt-3.5-turbo", apiKey);
         }
+
 
         public async Task<string> GetAiGeneratedChatAsync(string userPrompt)
         {
             if (string.IsNullOrWhiteSpace(userPrompt))
                 throw new ArgumentException("Der BenutzerPrompt darf nicht leer sein.", nameof(userPrompt));
 
-        
+
             var messages = new List<ChatMessage>
             {
                 new UserChatMessage(userPrompt)
