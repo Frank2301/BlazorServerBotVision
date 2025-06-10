@@ -2,9 +2,12 @@ using BlazorServerBotVision.Application.Extensions;
 using BlazorServerBotVision.Infrastructure.Extensions;
 using BlazorServerBotVision.Persistence.Extensions;
 
-
-
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Configuration
+    .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+    .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true, reloadOnChange: true)
+    .AddEnvironmentVariables();
 
 if (builder.Environment.IsDevelopment())
 {
@@ -22,7 +25,7 @@ var app = builder.Build();
 
 if (!app.Environment.IsDevelopment())
 {
-    // HSTS Standardwert, ggf. an Produktionsszenarien anpassen
+    // HSTS - passe den Standardwert ggf. an deine Produktionsszenarien an.
     app.UseHsts();
 }
 

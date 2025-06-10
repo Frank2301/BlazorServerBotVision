@@ -4,27 +4,22 @@
     <TargetFramework>net9.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
-    <AddRazorSupportForMvc>true</AddRazorSupportForMvc>  
+    <AddRazorSupportForMvc>true</AddRazorSupportForMvc>    
   </PropertyGroup>
-
-
-  <ItemGroup>
-    <Compile Remove="Areas\**" />
-    <Content Remove="Areas\**" />
-    <EmbeddedResource Remove="Areas\**" />
-    <None Remove="Areas\**" />
-  </ItemGroup>
 
   <ItemGroup>
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
   </ItemGroup>
 
+
+
+
+
+
   <ItemGroup>
     <ProjectReference Include="..\BlazorServerBotVision.Application\BlazorServerBotVision.Application.csproj" />
     <ProjectReference Include="..\BlazorServerBotVision.Shared\BlazorServerBotVision.Shared.csproj" />
   </ItemGroup>
-
-
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Components" Version="9.0.5" />
@@ -34,8 +29,5 @@
     <AssemblyName>BlazorServerBotVision.UI</AssemblyName>
     <RootNamespace>BlazorServerBotVision.UI</RootNamespace>
   </PropertyGroup>
-
-
-
 
 </Project>
