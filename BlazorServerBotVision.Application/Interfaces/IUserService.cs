@@ -1,16 +1,16 @@
-﻿using BlazorServerBotVision.Application.DTOs;
+﻿namespace BlazorServerBotVision.Application.Interfaces;
 
-namespace BlazorServerBotVision.Application.Interfaces
+using BlazorServerBotVision.Application.DTOs;
+
+
+public interface IUserService
 {
-    public interface IUserService
-    {
-        Task<UserDTO> GetUserByIdAsync(Guid id);
-        Task<IEnumerable<UserDTO>> GetAllUsersAsync();
-        Task AddUserAsync(UserDTO userDto);
-        Task UpdateUserAsync(UserDTO userDto);
-        Task DeleteUserAsync(Guid id);
+    Task<UserDTO> GetUserByIdAsync(Guid id);
+    Task<IEnumerable<UserDTO>> GetAllUsersAsync();
+    Task AddUserAsync(UserDTO userDto);
+    Task UpdateUserAsync(UserDTO userDto);
+    Task DeleteUserAsync(Guid id);
+    Task<UserDTO> GetOrCreateDefaultUserAsync();
 
-
-        Task<UserDTO> GetOrCreateDefaultUserAsync();
-    }
+    Task<UserDTO> GetUserByEmailAsync(string email); 
 }

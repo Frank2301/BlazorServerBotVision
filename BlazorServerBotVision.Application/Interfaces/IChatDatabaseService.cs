@@ -1,6 +1,7 @@
-﻿using BlazorServerBotVision.Application.DTOs;
+﻿namespace BlazorServerBotVision.Application.Interfaces;
 
-namespace BlazorServerBotVision.Application.Interfaces;
+using BlazorServerBotVision.Application.DTOs;
+
 
 public interface IChatDatabaseService
 {

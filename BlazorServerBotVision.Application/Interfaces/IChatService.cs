@@ -1,10 +1,10 @@
-﻿using BlazorServerBotVision.Application.DTOs;
+﻿namespace BlazorServerBotVision.Application.Interfaces;
 
-namespace BlazorServerBotVision.Application.Interfaces
+using BlazorServerBotVision.Application.DTOs;
+
+
+public interface IChatService
 {
-    public interface IChatService
-    {
-        Task SaveChatAsync(ChatDTO chatDto, Guid userId);
-        Task<IEnumerable<ChatDTO>> GetUserChatsAsync(Guid userId);
-    }
+    Task SaveChatAsync(ChatDTO chatDto, Guid userId);
+    Task<IEnumerable<ChatDTO>> GetUserChatsAsync(Guid userId);
 }

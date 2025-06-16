@@ -1,15 +1,21 @@
 ﻿@page "/chat"
 @using BlazorServerBotVision.Application.DTOs
 @using BlazorServerBotVision.Application.Interfaces
+
 @inject IChatAIService ChatAIService
 @inject IChatDatabaseService ChatDatabaseService
 @inject IUserService UserService
+@inject AuthenticationStateProvider AuthStateProvider
+
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.Authorization
+@attribute [Authorize]
 
 <h3 class="text-center">Chatbot</h3>
 
 <div class="container">
     <div class="row">
-        <!-- Eingabebereich -->
+    
         <div class="col-md-6">
             <div class="card shadow-sm">
                 <div class="card-body">
@@ -25,7 +31,7 @@
             }
         </div>
 
-        <!-- AI & Datenbank-Antworten -->
+   
         <div class="col-md-6">
             <div class="card shadow-sm">
                 <div class="card-body">
@@ -71,11 +77,34 @@
     private List<ChatHistoryDTO> chatHistoryDTOs = new();
     private Guid currentUserId = Guid.Empty;
 
+
     protected override async Task OnInitializedAsync()
     {
-        var user = await UserService.GetOrCreateDefaultUserAsync();
-        currentUserId = user.Id;
+        var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        if (user.Identity != null && user.Identity.IsAuthenticated)
+        {
+            Console.WriteLine($"Benutzer eingeloggt: {user.Identity.Name}");
+          
+            var userDto = await UserService.GetUserByEmailAsync(user.Identity.Name);
+
+            if (userDto != null)
+            {
+                currentUserId = userDto.Id;
+                Console.WriteLine($"currentUserId gesetzt: {currentUserId}");
+            }
+            else
+            {
+                Console.WriteLine("Benutzer konnte nicht aus der Datenbank geladen werden!");
+            }
+        }
+        else
+        {
+            Console.WriteLine("Kein Benutzer eingeloggt!");
+        }
     }
+
 
     private async Task SendMessage()
     {
@@ -86,10 +115,19 @@
             var aiAnswer = await ChatAIService.GetAiGeneratedChatAsync(userPrompt);
             var dbResult = await ChatDatabaseService.GetDatabaseResultAsync(userPrompt);
 
-            chatDTOs.Add(new ChatDTO { Prompt = userPrompt, AIResponse = aiAnswer });
-            chatHistoryDTOs.Add(new ChatHistoryDTO { UserId = currentUserId, Prompt = userPrompt, AIResponse = aiAnswer, DBResponse = dbResult });
+            var chatDto = new ChatDTO { Prompt = userPrompt, AIResponse = aiAnswer };
+            var chatHistoryDto = new ChatHistoryDTO
+            {
+                UserId = currentUserId,
+                Prompt = userPrompt,
+                AIResponse = aiAnswer,
+                DBResponse = dbResult
+            };
 
-            await ChatDatabaseService.SaveChatMessageAsync(chatHistoryDTOs.Last());
+            chatDTOs.Add(chatDto);
+            chatHistoryDTOs.Add(chatHistoryDto);
+
+            await ChatDatabaseService.SaveChatMessageAsync(chatHistoryDto);
 
             statusMessage = "Nachricht gesendet!";
             userPrompt = string.Empty;

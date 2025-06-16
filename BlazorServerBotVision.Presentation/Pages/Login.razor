@@ -1,0 +1,72 @@
+﻿@page "/login"
+@using BlazorServerBotVision.Application.DTOs
+@using BlazorServerBotVision.Application.Interfaces
+@using BlazorServerBotVision.Application.Services
+
+@inject IAuthenticationService AuthService
+@inject AuthenticationStateProvider AuthStateProvider
+@inject NavigationManager Navigation
+@inject IAuthenticationStateHandler AuthStateHandler
+@inject IJSRuntime JSRuntime
+
+<h3>Login</h3>
+
+@if (loginSuccess)
+{
+    <div class="alert alert-success mt-3">
+        Login erfolgreich! Du wirst gleich weitergeleitet...
+    </div>
+}
+
+<EditForm Model="loginModel" OnValidSubmit="HandleLogin">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+    <div class="mb-3">
+        <label for="email">Email</label>
+        <InputText id="email" class="form-control" @bind-Value="loginModel.Email" />
+        <ValidationMessage For="@(() => loginModel.Email)" />
+    </div>
+    <div class="mb-3">
+        <label for="password">Passwort</label>
+        <InputText id="password" type="password" class="form-control" @bind-Value="loginModel.Password" />
+        <ValidationMessage For="@(() => loginModel.Password)" />
+    </div>
+    <button class="btn btn-primary" type="submit">Login</button>
+</EditForm>
+
+@if (!string.IsNullOrEmpty(errorMessage))
+{
+    <div class="alert alert-danger mt-3">
+        @errorMessage
+    </div>
+}
+
+@code {
+    private LoginDTO loginModel = new();
+    private string errorMessage = string.Empty;
+    private bool loginSuccess = false;
+
+    private async Task HandleLogin()
+    {
+        try
+        {          
+            var user = await AuthService.LoginAsync(loginModel);
+            loginSuccess = true;
+            Console.WriteLine("Login erfolgreich – nun authentifizieren und Session laden.");
+         
+            await AuthStateHandler.MarkUserAsAuthenticated(user.Email);
+            await AuthStateHandler.LoadUserFromSessionAsync();         
+
+            var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+            Console.WriteLine($"Nach Login – Ist Benutzer eingeloggt? {authState.User.Identity.IsAuthenticated}");
+           
+            Navigation.NavigateTo("/Chat");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("Login-Fehler: " + ex.Message);
+            errorMessage = ex.Message;
+            await InvokeAsync(StateHasChanged);
+        }
+    }
+}

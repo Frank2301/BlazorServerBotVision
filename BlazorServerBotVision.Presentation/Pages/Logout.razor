@@ -1,0 +1,18 @@
+﻿@page "/logout"
+@using BlazorServerBotVision.Application.Interfaces
+@inject IAuthenticationService AuthService
+@inject NavigationManager Navigation
+@attribute [Authorize]
+
+
+<h3>Logout</h3>
+<p>Bist du sicher, dass du dich abmelden möchtest?</p>
+<button class="btn btn-danger" @onclick="HandleLogout">Abmelden</button>
+
+@code {
+    private async Task HandleLogout()
+    {
+        await AuthService.LogoutAsync();
+        Navigation.NavigateTo("/");
+    }
+}

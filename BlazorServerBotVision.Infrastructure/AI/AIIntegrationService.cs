@@ -1,42 +1,40 @@
-﻿using BlazorServerBotVision.Application.Interfaces;
+﻿namespace BlazorServerBotVision.Infrastructure.AI;
+
+using BlazorServerBotVision.Application.Interfaces;
 using Microsoft.Extensions.Configuration;
 using OpenAI.Chat;
 
-
-namespace BlazorServerBotVision.Infrastructure.AI
+public class AiIntegrationService : IChatAIService
 {
-    public class AiIntegrationService : IChatAIService
+    private readonly ChatClient _chatClient;
+
+    public AiIntegrationService(IConfiguration configuration)
     {
-        private readonly ChatClient _chatClient;
+        var apiKey = configuration["OpenAI:ApiKey"];
+        if (string.IsNullOrWhiteSpace(apiKey))
+            throw new ArgumentException("Der OpenAI API Key fehlt in der Konfiguration.");
+      
+        _chatClient = new ChatClient("gpt-3.5-turbo", apiKey);
+    }
 
-        public AiIntegrationService(IConfiguration configuration)
+
+    public async Task<string> GetAiGeneratedChatAsync(string userPrompt)
+    {
+        if (string.IsNullOrWhiteSpace(userPrompt))
+            throw new ArgumentException("Der BenutzerPrompt darf nicht leer sein.", nameof(userPrompt));
+
+
+        var messages = new List<ChatMessage>
         {
-            var apiKey = configuration["OpenAI:ApiKey"];
-            if (string.IsNullOrWhiteSpace(apiKey))
-                throw new ArgumentException("Der OpenAI API Key fehlt in der Konfiguration.");
-          
-            _chatClient = new ChatClient("gpt-3.5-turbo", apiKey);
-        }
+            new UserChatMessage(userPrompt)
+        };
 
+        var completionResult = await _chatClient.CompleteChatAsync(messages);
+        var chatCompletion = completionResult.Value;
+        var aiResponse = chatCompletion.Content?.LastOrDefault()?.Text?.Trim();
 
-        public async Task<string> GetAiGeneratedChatAsync(string userPrompt)
-        {
-            if (string.IsNullOrWhiteSpace(userPrompt))
-                throw new ArgumentException("Der BenutzerPrompt darf nicht leer sein.", nameof(userPrompt));
-
-
-            var messages = new List<ChatMessage>
-            {
-                new UserChatMessage(userPrompt)
-            };
-
-            var completionResult = await _chatClient.CompleteChatAsync(messages);
-            var chatCompletion = completionResult.Value;
-            var aiResponse = chatCompletion.Content?.LastOrDefault()?.Text?.Trim();
-
-            return string.IsNullOrWhiteSpace(aiResponse)
-                ? "Es tut mir leid, aber es wurde keine Antwort generiert."
-                : aiResponse;
-        }
+        return string.IsNullOrWhiteSpace(aiResponse)
+            ? "Es tut mir leid, aber es wurde keine Antwort generiert."
+            : aiResponse;
     }
 }
