@@ -8,36 +8,47 @@
 - **Blazor Server:** Moderne, komponentenbasierte Benutzeroberfläche mit C# und Blazor.
 - **EF Core & MS SQL Server:** Robuste Datenpersistenz, migrationsbasiert und asynchron implementiert.
 - **Statische DI-Konfiguration:** Konfiguration der Abhängigkeiten über statische, erweiterte Methoden anstelle der üblichen DI im `Program.cs`.
-- **AI Integration:** Nutzung von AI Diensten (Azure.AI.OpenAI bzw. Microsoft.Extensions.AI) für Chatbot-Funktionalitäten.
-- **Asynchrone Programmierung:** Effiziente und responsive Datenverarbeitung.
+- **AI Integration:** Nutzung eines AI Dienstes (OpenAI) für Chatbot Funktionalitäten.
+- **Asynchrone Programmierung:** Effiziente Datenverarbeitung.
 - **Logging, Caching & Sessions:** Integriertes Logging für Diagnostik, geplante Caching Mechanismen und Session Management.
 - **Unit Testing:** Gut strukturierte Grundlage für umfangreiche Unit Tests.
-- **Zukünftige Features:** Erweiterung um Authentication/Authorization.
+- **Authentication/Authorization:** Wurde mit dem vierten Meilenstein integriert.
 
 ## Projektstruktur
-- **Domain:**  
-    Beinhaltet Kern-Entitäten wie `User` (mit Basisinformationen und geerbtem `BaseEntity`), `Chat` und `ChatHistory`. Alle Entitäten nutzen GUIDs als Primärschlüssel,      um eine weltweit eindeutige Identifikation sicherzustellen.
-- **Application:** Implementiert die Geschäftslogik (Services) und enthält dazugehörige DTOs.
-- **Persistence:**  
-    Beinhaltet den `ApplicationDbContext`, EF Core Migrations sowie ausgelagerte Konfigurationsklassen (z. B. `UserConfiguration`, `ChatConfiguration`, ChatHistoryConfiguration`), die das Datenbankschema anhand der Domain Modelle definieren.
-- **Infrastructure:** Kapselt externe Service Integrationen sowie Logging und hilfreiche Utilities.
-- **Presentation:** Verantwortlich für Anwendungsstart, Routing und DI Konfiguration mittels statischer Erweiterungsmethoden.
-- **Shared:** Bietet Basis Klassen, Utilities und Konfigurationen, die in mehreren Projekten wiederverwendet werden.
-- **UI:** Implementiert Blazor-Komponenten und Seiten für die Benutzeroberfläche.
-
+- **Domain:**   
+- **Application:** 
+- **Persistence:** 
+- **Infrastructure:**
+- **Presentation:** 
+- **Shared:** 
+- **UI:**
+- 
 ## Voraussetzungen
 
 - Visual Studio 2022
 - .NET9 SDK
 - MS SQL Server
+- Nuget Pakete - z.B.: Blazored.SessionStorage, OpenAI,
+- OpenAI Key
+- ConnectionString
 
-## Einrichtung und Ausführung
 
-1. Repository klonen.
-2. NuGet Pakete wiederherstellen.
-3. EF Core Migrationen ausführen, um die Datenbank zu initialisieren.
-4. In Visual Studio 2022 starten.
+## umgesetzte Meilensteine
 
-## Meilensteine
+**Meilenstein v1.0 – Clean Architecture**
 
-Der erste Meilenstein **"Meilenstein v1.0 - Clean Architecture"** fokussiert sich auf den Aufbau der gesamten Architektur inklusive Domain, Application und Persistence. Der zweite Meilenstein **"Meilenstein v2.0 - AI Integration"** auf die Integratrion von OpenAI. Zukünftige Meilensteine werden weitere Funktionen, wie z.B. Caching, Logging und Authentifizierung umfassen.
+Fokus: Aufbau der gesamten Architektur
+Bereiche: Domain, Application, Infrastructure, Presentation, Persistence, Presention, UI
+
+**Meilenstein v2.0 – AI Integration**
+
+Fokus: Integration von OpenAI
+Ziel: Intelligente AI Features in die Anwendung einbinden
+
+**Meilenstein v3.0 – UI Integration**
+
+Fokus: Verbindung der Benutzeroberfläche mit der Backend Logik
+
+**Meilenstein v4.0 – User Login, Autorisierung, Authentifizierung und SessionStorage**
+
+Fokus: Login und Registrierung, Sicherheitsfunktionen (Autorisierung und Authentifizierung) sowie Session Verwaltung
