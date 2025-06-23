@@ -1,16 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
+﻿namespace BlazorServerBotVision.Domain.Entities;
 
-namespace BlazorServerBotVision.Domain.Entities
+public class User : BaseEntity
 {
-    public class User : BaseEntity
-    {
-        public string FirstName { get; set; } = string.Empty;
-        public string LastName { get; set; } = string.Empty;
-        public string UserName { get; set; } = string.Empty;
-        public string Email { get; set; } = string.Empty;
-        public string PasswordHash { get; set; } = string.Empty;
+    public string FirstName { get; set; } = string.Empty;
+    public string LastName { get; set; } = string.Empty;
+    public string UserName { get; set; } = string.Empty;
+    public string Email { get; set; } = string.Empty;
+    public string PasswordHash { get; set; } = string.Empty;
 
-        public ICollection<Chat> Chats { get; set; } = new List<Chat>();
-    }
+    public ICollection<ChatHistory> ChatHistories { get; set; } = [];
 }

@@ -1,12 +1,44 @@
-﻿<Router AppAssembly="@typeof(App).Assembly">
-    <Found Context="routeData">
-        <RouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)" />
-        <FocusOnNavigate RouteData="@routeData" Selector="h1" />
-    </Found>
-    <NotFound>
-        <PageTitle>Not found</PageTitle>
-        <LayoutView Layout="@typeof(MainLayout)">
-            <p role="alert">Sorry, there's nothing at this address.</p>
-        </LayoutView>
-    </NotFound>
-</Router>
+﻿@using BlazorServerBotVision.Application.Interfaces
+@inject IAuthenticationStateHandler AuthStateHandler
+
+<CascadingAuthenticationState>
+    <Router AppAssembly="@typeof(App).Assembly"
+            AdditionalAssemblies="new[] { typeof(BlazorServerBotVision.UI.MainLayout).Assembly }">
+        <Found Context="routeData">
+            <AuthorizeRouteView RouteData="@routeData" DefaultLayout="@typeof(BlazorServerBotVision.UI.MainLayout)">
+                <NotAuthorized>
+                    <p>Du bist nicht berechtigt, diese Seite zu sehen. Bitte <NavLink href="login">einloggen</NavLink>.</p>
+                </NotAuthorized>
+            </AuthorizeRouteView>
+            <FocusOnNavigate RouteData="@routeData" Selector="h1" />
+        </Found>
+        <NotFound>
+            <PageTitle>Not found</PageTitle>
+            <LayoutView Layout="@typeof(BlazorServerBotVision.UI.MainLayout)">
+                <p role="alert">Sorry, there's nothing at this address.</p>
+            </LayoutView>
+        </NotFound>
+    </Router>
+</CascadingAuthenticationState>
+
+@code {
+    private bool _isInitialized = false;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender && !_isInitialized)
+        {
+            _isInitialized = true;          
+            try
+            {
+                Console.WriteLine("Lade Benutzer aus Session...");
+                await AuthStateHandler.LoadUserFromSessionAsync();
+                Console.WriteLine("Benutzer erfolgreich aus Session geladen.");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Fehler beim Laden der Session: {ex.Message}");
+            }
+        }
+    }
+}

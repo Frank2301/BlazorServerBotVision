@@ -1,0 +1,37 @@
+﻿@inherits LayoutComponentBase
+@namespace BlazorServerBotVision.UI
+@using BlazorServerBotVision.UI.Components
+@using Microsoft.AspNetCore.Components.Web
+@using Microsoft.AspNetCore.Components.Authorization
+@using BlazorServerBotVision.Application.Services
+
+<PageTitle>BlazorServerBotVision</PageTitle>
+
+<div class="page">
+    <div class="sidebar">
+        <NavigationMenu />
+    </div>
+
+    <main>
+        <div class="top-row px-4">
+            <a href="https://docs.microsoft.com/aspnet/" target="_blank">About</a>
+        </div>
+
+        <article class="content px-4">
+            @Body
+        </article>
+    </main>
+</div>
+
+@inject AuthenticationStateProvider AuthStateProvider
+
+@code {
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+            Console.WriteLine($"Nach Navigation (OnAfterRender) – Ist Benutzer eingeloggt? {authState.User.Identity.IsAuthenticated}");
+        }
+    }
+}

@@ -1,9 +1,6 @@
-﻿using System.Threading.Tasks;
+﻿namespace BlazorServerBotVision.Application.Interfaces;
 
-namespace BlazorServerBotVision.Application.Interfaces
+public interface IChatAIService
 {
-    public interface IChatAIService
-    {
-        Task<string> GetAiGeneratedChatAsync(string userPrompt);
-    }
+    Task<string> GetAiGeneratedChatAsync(string userPrompt);
 }

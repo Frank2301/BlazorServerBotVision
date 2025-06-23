@@ -1,10 +1,24 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
-  <PropertyGroup>
-    <TargetFramework>net9.0</TargetFramework>
-    <Nullable>enable</Nullable>
-    <ImplicitUsings>enable</ImplicitUsings>
+<PropertyGroup>
+  <TargetFramework>net9.0</TargetFramework>
+  <Nullable>enable</Nullable> 
+  <ImplicitUsings>enable</ImplicitUsings>
+  <UserSecretsId>b92fe902-9a7c-43dd-b7d6-6b4b8635f4b6</UserSecretsId>
   </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Blazored.SessionStorage" Version="2.4.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.5">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.5">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.Extensions.Caching.StackExchangeRedis" Version="9.0.6" />
+  </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\BlazorServerBotVision.Application\BlazorServerBotVision.Application.csproj" />
@@ -12,5 +26,12 @@
     <ProjectReference Include="..\BlazorServerBotVision.Persistence\BlazorServerBotVision.Persistence.csproj" />
     <ProjectReference Include="..\BlazorServerBotVision.Shared\BlazorServerBotVision.Shared.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\BlazorServerBotVision.UI\BlazorServerBotVision.UI.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="wwwroot\css\" />
+  </ItemGroup>
+
 
 </Project>

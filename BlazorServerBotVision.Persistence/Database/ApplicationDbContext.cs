@@ -1,13 +1,22 @@
-﻿using BlazorServerBotVision.Domain.Entities;
-using Microsoft.EntityFrameworkCore;
+﻿namespace BlazorServerBotVision.Persistence.Database;
 
-namespace BlazorServerBotVision.Persistence.Database
+using Microsoft.EntityFrameworkCore;
+using BlazorServerBotVision.Domain.Entities;
+
+
+public class ApplicationDbContext : DbContext
 {
-    public class ApplicationDbContext : DbContext
+    public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
+        : base(options)
     {
-        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) { }
-        public DbSet<User> Users { get; set; }
-        public DbSet<Chat> Chats { get; set; }
-        public DbSet<ChatHistory> ChatHistories { get; set; }
+    }
+
+    public DbSet<User> Users { get; set; } 
+    public DbSet<ChatHistory> ChatHistories { get; set; }
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        base.OnModelCreating(modelBuilder);
+        modelBuilder.ApplyConfigurationsFromAssembly(typeof(ApplicationDbContext).Assembly);
     }
 }

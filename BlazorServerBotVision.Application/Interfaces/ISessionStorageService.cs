@@ -1,0 +1,9 @@
+﻿namespace BlazorServerBotVision.Application.Interfaces;
+
+public interface ISessionStorageService
+{
+    Task SetItemAsync<T>(string key, T data);
+    Task<T?> GetItemAsync<T>(string key);
+    Task RemoveItemAsync(string key);
+    Task ClearAsync(); 
+}
