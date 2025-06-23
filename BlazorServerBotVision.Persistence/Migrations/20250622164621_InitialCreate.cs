@@ -37,7 +37,8 @@ namespace BlazorServerBotVision.Persistence.Migrations
                     LastModified = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "GETUTCDATE()"),
                     Prompt = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: false),
                     AIResponse = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    DBResponse = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    DBResponse = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "GETUTCDATE()")
                 },
                 constraints: table =>
                 {
@@ -50,37 +51,9 @@ namespace BlazorServerBotVision.Persistence.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
-            migrationBuilder.CreateTable(
-                name: "Chats",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Timestamp = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "GETUTCDATE()"),
-                    Prompt = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: false),
-                    AIResponse = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    DBResponse = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    IsSaved = table.Column<bool>(type: "bit", nullable: false, defaultValue: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Chats", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Chats_Users_UserId",
-                        column: x => x.UserId,
-                        principalTable: "Users",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
             migrationBuilder.CreateIndex(
                 name: "IX_ChatHistory_UserId",
                 table: "ChatHistories",
-                column: "UserId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Chat_UserId",
-                table: "Chats",
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
@@ -95,9 +68,6 @@ namespace BlazorServerBotVision.Persistence.Migrations
         {
             migrationBuilder.DropTable(
                 name: "ChatHistories");
-
-            migrationBuilder.DropTable(
-                name: "Chats");
 
             migrationBuilder.DropTable(
                 name: "Users");

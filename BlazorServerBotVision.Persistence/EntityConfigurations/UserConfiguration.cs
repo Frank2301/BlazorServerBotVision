@@ -30,7 +30,7 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
         builder.Property(u => u.PasswordHash)
                .IsRequired();
       
-        builder.HasMany(u => u.Chats)
+        builder.HasMany(u => u.ChatHistories)
                .WithOne(c => c.User)
                .HasForeignKey(c => c.UserId)
                .OnDelete(DeleteBehavior.Cascade);

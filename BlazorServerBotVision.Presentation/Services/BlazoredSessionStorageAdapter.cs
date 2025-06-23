@@ -27,4 +27,10 @@ public class BlazoredSessionStorageAdapter : ISessionStorageService
     {
         await _blazoredSessionStorage.RemoveItemAsync(key);
     }
+
+    public async Task ClearAsync()
+    {
+        await _blazoredSessionStorage.ClearAsync();
+    }
+
 }

@@ -53,7 +53,9 @@
         <ValidationMessage For="@(() => registerModel.ConfirmPassword)" />
     </div>
 
-    <button class="btn btn-primary" type="submit">Registrieren</button>
+    <button class="btn btn-primary" type="submit" disabled="@isBusy">
+        @(isBusy ? "Bitte warten…" : "Registrieren")
+    </button>
 </EditForm>
 
 @if (!string.IsNullOrEmpty(errorMessage))
@@ -63,21 +65,34 @@
 
 @code {
     private RegisterDTO registerModel = new();
+    private bool isBusy = false;
     private string errorMessage = string.Empty;
     private bool registrationSuccess = false;
 
     private async Task HandleRegister()
     {
+        if (isBusy) return;
+        isBusy = true;
+        errorMessage = null;
         try
-        {
+        {         
             var user = await AuthService.RegisterAsync(registerModel);
             registrationSuccess = true;
-            await Task.Delay(2000); 
-            Navigation.NavigateTo("/login"); 
+         
+            await Task.Delay(2000);
+            Navigation.NavigateTo("/login");
+        }
+        catch (InvalidOperationException ex)
+        {         
+            errorMessage = ex.Message;
         }
         catch (Exception ex)
+        {           
+            errorMessage = "Registrierung fehlgeschlagen: " + ex.Message;
+        }
+        finally
         {
-            errorMessage = ex.Message;
+            isBusy = false;
             await InvokeAsync(StateHasChanged);
         }
     }

@@ -16,8 +16,7 @@ public static class PersistenceServiceExtensions
         services.AddDbContext<ApplicationDbContext>(options =>
             options.UseSqlServer(configuration.GetConnectionString("DefaultConnection")));
 
-        services.AddScoped<IUserRepository, UserRepository>();
-        services.AddScoped<IChatRepository, ChatRepository>();
+        services.AddScoped<IUserRepository, UserRepository>();     
         services.AddScoped<IChatHistoryRepository, ChatHistoryRepository>();
 
         return services;

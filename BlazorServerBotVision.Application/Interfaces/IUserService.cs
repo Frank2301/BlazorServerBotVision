@@ -11,6 +11,5 @@ public interface IUserService
     Task UpdateUserAsync(UserDTO userDto);
     Task DeleteUserAsync(Guid id);
     Task<UserDTO> GetOrCreateDefaultUserAsync();
-
     Task<UserDTO> GetUserByEmailAsync(string email); 
 }

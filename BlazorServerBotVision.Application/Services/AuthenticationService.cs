@@ -1,11 +1,8 @@
-﻿namespace BlazorServerBotVision.Application.Services;
-
-using BlazorServerBotVision.Application.DTOs;
+﻿using BlazorServerBotVision.Application.DTOs;
 using BlazorServerBotVision.Application.Interfaces;
 using BlazorServerBotVision.Domain.Entities;
 using BlazorServerBotVision.Domain.Interfaces;
 using Microsoft.AspNetCore.Identity;
-
 
 public class AuthenticationService : IAuthenticationService
 {
@@ -13,8 +10,9 @@ public class AuthenticationService : IAuthenticationService
     private readonly PasswordHasher<User> _passwordHasher;
     private readonly IAuthenticationStateHandler _authStateHandler;
 
-    public AuthenticationService(IUserRepository userRepository,
-                                 IAuthenticationStateHandler authStateHandler)
+    public AuthenticationService(
+        IUserRepository userRepository,
+        IAuthenticationStateHandler authStateHandler)
     {
         _userRepository = userRepository;
         _passwordHasher = new PasswordHasher<User>();
@@ -23,16 +21,14 @@ public class AuthenticationService : IAuthenticationService
 
     public async Task<UserDTO> RegisterAsync(RegisterDTO registerDto)
     {
-        var existingUser = await _userRepository.GetByEmailAsync(registerDto.Email);
-        if (existingUser != null)
-        {
-            throw new Exception("Ein Benutzer mit dieser E-Mail existiert bereits.");
-        }
+        var existingUser = await _userRepository.FindByEmailAsync(registerDto.Email);
+        if (existingUser is not null)
+            throw new InvalidOperationException(
+                "Ein Benutzer mit dieser E-Mail existiert bereits.");
 
         if (registerDto.Password != registerDto.ConfirmPassword)
-        {
-            throw new Exception("Passwörter stimmen nicht überein.");
-        }
+            throw new InvalidOperationException(
+                "Passwörter stimmen nicht überein.");
 
         var newUser = new User
         {
@@ -43,9 +39,10 @@ public class AuthenticationService : IAuthenticationService
             CreatedAt = DateTime.UtcNow
         };
 
-        newUser.PasswordHash = _passwordHasher.HashPassword(newUser, registerDto.Password);
+        newUser.PasswordHash =
+            _passwordHasher.HashPassword(newUser, registerDto.Password);
+
         await _userRepository.AddAsync(newUser);
-                 
         await _authStateHandler.MarkUserAsAuthenticated(newUser.Email);
 
         return new UserDTO
@@ -60,19 +57,15 @@ public class AuthenticationService : IAuthenticationService
 
     public async Task<UserDTO> LoginAsync(LoginDTO loginDto)
     {
-        var user = await _userRepository.GetByEmailAsync(loginDto.Email);
+        var user = await _userRepository.FindByEmailAsync(loginDto.Email);
+        if (user is null)
+            throw new UnauthorizedAccessException("Ungültige Anmeldedaten.");
 
-        if (user == null)
-        {
-            throw new Exception("Benutzer nicht gefunden.");
-        }
-    
-        var verificationResult = _passwordHasher.VerifyHashedPassword(user, user.PasswordHash, loginDto.Password);
+        var result = _passwordHasher.VerifyHashedPassword(
+            user, user.PasswordHash, loginDto.Password);
 
-        if (verificationResult == PasswordVerificationResult.Failed)
-        {
-            throw new Exception("Ungültige Anmeldedaten.");
-        }
+        if (result == PasswordVerificationResult.Failed)
+            throw new UnauthorizedAccessException("Ungültige Anmeldedaten.");
 
         await _authStateHandler.MarkUserAsAuthenticated(user.Email);
 
@@ -86,9 +79,6 @@ public class AuthenticationService : IAuthenticationService
         };
     }
 
-
-    public async Task LogoutAsync()
-    {
-        await _authStateHandler.MarkUserAsLoggedOut();
-    }
+    public Task LogoutAsync()
+        => _authStateHandler.MarkUserAsLoggedOut();
 }

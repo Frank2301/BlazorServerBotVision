@@ -11,8 +11,7 @@ public class ApplicationDbContext : DbContext
     {
     }
 
-    public DbSet<User> Users { get; set; }
-    public DbSet<Chat> Chats { get; set; }
+    public DbSet<User> Users { get; set; } 
     public DbSet<ChatHistory> ChatHistories { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)

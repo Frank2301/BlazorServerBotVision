@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BlazorServerBotVision.Persistence.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250602084827_InitialCreate")]
+    [Migration("20250622164621_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -25,46 +25,6 @@ namespace BlazorServerBotVision.Persistence.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("BlazorServerBotVision.Domain.Entities.Chat", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("AIResponse")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("DBResponse")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("IsSaved")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bit")
-                        .HasDefaultValue(false);
-
-                    b.Property<string>("Prompt")
-                        .IsRequired()
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
-
-                    b.Property<DateTime>("Timestamp")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime2")
-                        .HasDefaultValueSql("GETUTCDATE()");
-
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId")
-                        .HasDatabaseName("IX_Chat_UserId");
-
-                    b.ToTable("Chats");
-                });
-
             modelBuilder.Entity("BlazorServerBotVision.Domain.Entities.ChatHistory", b =>
                 {
                     b.Property<Guid>("Id")
@@ -74,6 +34,11 @@ namespace BlazorServerBotVision.Persistence.Migrations
                     b.Property<string>("AIResponse")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETUTCDATE()");
 
                     b.Property<string>("DBResponse")
                         .IsRequired()
@@ -142,21 +107,10 @@ namespace BlazorServerBotVision.Persistence.Migrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("BlazorServerBotVision.Domain.Entities.Chat", b =>
-                {
-                    b.HasOne("BlazorServerBotVision.Domain.Entities.User", "User")
-                        .WithMany("Chats")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("User");
-                });
-
             modelBuilder.Entity("BlazorServerBotVision.Domain.Entities.ChatHistory", b =>
                 {
                     b.HasOne("BlazorServerBotVision.Domain.Entities.User", "User")
-                        .WithMany()
+                        .WithMany("ChatHistories")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -166,7 +120,7 @@ namespace BlazorServerBotVision.Persistence.Migrations
 
             modelBuilder.Entity("BlazorServerBotVision.Domain.Entities.User", b =>
                 {
-                    b.Navigation("Chats");
+                    b.Navigation("ChatHistories");
                 });
 #pragma warning restore 612, 618
         }
