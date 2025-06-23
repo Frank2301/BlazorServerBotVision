@@ -22,13 +22,13 @@
 - **Presentation:** 
 - **Shared:** 
 - **UI:**
-- 
+  
 ## Voraussetzungen
 
 - Visual Studio 2022
 - .NET9 SDK
 - MS SQL Server
-- Nuget Pakete - z.B.: Blazored.SessionStorage, OpenAI,
+- Nuget Pakete - z.B.: Blazored.SessionStorage, OpenAI
 - OpenAI Key
 - ConnectionString
 
@@ -52,3 +52,6 @@ Fokus: Verbindung der Benutzeroberfläche mit der Backend Logik
 **Meilenstein v4.0 – User Login, Autorisierung, Authentifizierung und SessionStorage**
 
 Fokus: Login und Registrierung, Sicherheitsfunktionen (Autorisierung und Authentifizierung) sowie Session Verwaltung
+
+**Meilenstein v5.0 – caching - persistenceDB**
+Fokus: Caching wurde eingebaut. Außerdem werden AI Chats nun gespeichert, geladen und können gelöscht werden.
