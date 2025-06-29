@@ -1,0 +1,80 @@
+﻿@using Microsoft.AspNetCore.Components
+
+<div class="container mb-3">
+    <div class="d-flex align-items-center mb-2">
+     
+        <select value="@Language"
+                @onchange="OnLanguageChangedHandler"
+                class="form-select w-auto me-2">
+            <option value="de-DE">Deutsch</option>
+            <option value="en-US">Englisch</option>
+        </select>
+
+        <button type="button"
+                class="btn btn-outline-secondary me-2"
+                @onclick="OnStartDictation"
+                disabled="@IsBusy">
+            @(IsDictating ? "⏹️ Stoppen" : "🎤 Spracheingabe")
+        </button>
+
+        <button type="button"
+                class="btn btn-outline-secondary me-2"
+                @onclick="OnToggleContinuous"
+                disabled="@IsBusy">
+            ↔️ Kontinuierlich
+        </button>
+  
+        <div class="form-check ms-auto">
+            <input class="form-check-input"
+                   type="checkbox"
+                   id="enableSpeak"
+                   checked="@EnableSpeak"
+                   @onchange="OnEnableSpeakChangedHandler" />
+            <label class="form-check-label" for="enableSpeak">
+                Antwort vorlesen
+            </label>
+        </div>
+    </div>
+
+    @if (!string.IsNullOrEmpty(SpeechError))
+    {
+        <div class="alert alert-danger">@SpeechError</div>
+    }
+
+    @if (!string.IsNullOrEmpty(LiveText))
+    {
+        <div class="alert alert-info">
+            <small>Zwischenergebnis:</small> @LiveText
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter] public string Language { get; set; } = "de-DE";
+    [Parameter] public bool IsBusy { get; set; }
+    [Parameter] public bool IsDictating { get; set; }
+    [Parameter] public string LiveText { get; set; } = "";
+    [Parameter] public string SpeechError { get; set; } = "";
+    [Parameter] public bool EnableSpeak { get; set; }
+
+    [Parameter] public EventCallback<string> OnLanguageChanged { get; set; }
+    [Parameter] public EventCallback OnStartDictation { get; set; }
+    [Parameter] public EventCallback OnToggleContinuous { get; set; }
+    [Parameter] public EventCallback<bool> OnEnableSpeakChanged { get; set; }
+
+    private async Task OnLanguageChangedHandler(ChangeEventArgs e)
+    {
+        var lang = e.Value?.ToString() ?? Language;
+        Language = lang;
+        await OnLanguageChanged.InvokeAsync(lang);
+    }
+
+    private async Task OnEnableSpeakChangedHandler(ChangeEventArgs e)
+    {     
+        var enabled = e.Value is bool b && b
+          || (e.Value is string s && bool.TryParse(s, out var bb) && bb);
+
+        EnableSpeak = enabled;
+        await OnEnableSpeakChanged.InvokeAsync(enabled);
+    }
+}
