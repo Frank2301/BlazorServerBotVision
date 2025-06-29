@@ -5,7 +5,9 @@ using BlazorServerBotVision.Application.Services;
 using BlazorServerBotVision.Infrastructure.Extensions;
 using BlazorServerBotVision.Persistence.Extensions;
 using BlazorServerBotVision.Presentation.Services;
+using BlazorServerBotVision.UI.Helpers;
 using Microsoft.AspNetCore.Components.Authorization;
+using Microsoft.AspNetCore.Http.Connections;
 using AppSession = BlazorServerBotVision.Application.Interfaces.ISessionStorageService;
 using BlzSession = Blazored.SessionStorage.ISessionStorageService;
 
@@ -14,18 +16,27 @@ using BlzSession = Blazored.SessionStorage.ISessionStorageService;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Configuration
-  .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
-  .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true, reloadOnChange: true)
-  .AddEnvironmentVariables();
+    .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+    .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true, reloadOnChange: true)
+    .AddEnvironmentVariables();
+
 if (builder.Environment.IsDevelopment())
     builder.Configuration.AddUserSecrets<Program>();
 
+
 builder.Services.AddRazorPages();
-builder.Services.AddServerSideBlazor();
 
-builder.Services.AddBlazoredSessionStorage(); 
+builder.Services
+    .AddServerSideBlazor()
+    .AddCircuitOptions(options =>
+    {  
+        options.DetailedErrors = true;
+    });
+
+
+
+builder.Services.AddBlazoredSessionStorage();
 builder.Services.AddScoped<AppSession, BlazoredSessionStorageAdapter>();
-
 
 builder.Services.AddAuthorizationCore();
 builder.Services.AddScoped<CustomAuthenticationStateProvider>();
@@ -35,11 +46,10 @@ builder.Services.AddScoped<IAuthenticationStateHandler>(
     sp => sp.GetRequiredService<CustomAuthenticationStateProvider>());
 
 builder.Services.AddApplicationServices();
-
 builder.Services.AddPersistenceServices(builder.Configuration);
-
 builder.Services.AddInfrastructureServices();
 
+builder.Services.AddSpeechUI();
 
 var redisConn = builder.Configuration.GetConnectionString("Redis");
 if (!string.IsNullOrWhiteSpace(redisConn)
@@ -63,6 +73,11 @@ var app = builder.Build();
 app.UseStaticFiles();
 app.UseRouting();
 
+app.UseDeveloperExceptionPage();    
+// app.UseExceptionHandler("/Error"); 
+
 app.MapBlazorHub();
+
 app.MapFallbackToPage("/_Host");
+
 app.Run();

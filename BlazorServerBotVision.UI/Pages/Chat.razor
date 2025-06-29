@@ -1,183 +1,49 @@
 ﻿@page "/chat"
-@using BlazorServerBotVision.Application.DTOs
-@using BlazorServerBotVision.Application.Interfaces
+@attribute [Authorize]
+@using BlazorServerBotVision.UI.Components
 @using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components
 @using Microsoft.AspNetCore.Components.Authorization
 @using Microsoft.AspNetCore.Components.Web
 @using Microsoft.JSInterop
-@attribute [Authorize]
-
-@inject IChatOrchestrationService ChatOrchestrator
-@inject IUserService UserService
-@inject AuthenticationStateProvider AuthStateProvider
-@inject IJSRuntime JSRuntime
+@using BlazorServerBotVision.Application.DTOs
+@using BlazorServerBotVision.Application.Interfaces
+@using BlazorServerBotVision.UI.Helpers
 
 <h3 class="text-center">Chatbot</h3>
 
+<SpeechControls Language="@language"
+                IsBusy="@isBusy"
+                IsDictating="@isDictating"
+                LiveText="@liveText"
+                SpeechError="@speechError"
+                EnableSpeak="@enableSpeak"
+                OnLanguageChanged="lang => language = lang"
+                OnStartDictation="StartDictation"
+                OnToggleContinuous="ToggleContinuous"
+                OnEnableSpeakChanged="b => enableSpeak = b" />
+
 <div class="container">
-    <div class="row">     
-        <div class="col-md-6">
-            <div class="card shadow-sm mb-3">
-                <div class="card-body">
-                    <h5 class="card-title">Stelle Deine Anfrage</h5>
-                  
-                    <textarea class="form-control mb-2"
-                              rows="3"
-                              @bind="prompt"
-                              @bind:event="oninput"
-                              placeholder="@($"Gib Deine Frage ein, {userFirstName}…")"
-                              @onkeyup="HandleKeyUp"
-                              disabled="@isBusy">
-                     </textarea>
-                
-                    <button class="btn btn-primary w-100"
-                            disabled="@isBusy || HasReachedDailyLimit"
-                            @onclick="HandleAsk">
-                        @if (isBusy)
-                        {
-                            <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-                            <span class="visually-hidden">lädt…</span>
-                        }
-                        else
-                        {
-                            @("senden & speichern")
-                        }
-                    </button>
-
-                    @if (HasReachedDailyLimit)
-                    {
-                        <div class="alert alert-warning mt-2">
-                            Du hast dein Tageslimit (3) erreicht. Komm morgen gerne wieder.
-                        </div>
-                    }
-
-                    @if (lastAnswer is not null)
-                    {
-                        <div class="mt-3">
-                            <p><strong>AI-Antwort:</strong> @lastAnswer.AIResponse</p>
-                            <p><strong>DB-Antwort:</strong> @lastAnswer.DBResponse</p>
-                        </div>
-                    }
-
-                    @if (!string.IsNullOrEmpty(status))
-                    {
-                        <div class="alert alert-info mt-2">@status</div>
-                    }
-                </div>
-            </div>
-        </div>
-     
-        <div class="col-md-6">
-            <div class="card shadow-sm">
-                <div class="card-body" style="max-height:400px; overflow:auto;" @ref="historyDiv">
-                    <h5 class="card-title">Historie</h5>
-                    <ul class="list-group">
-                        @foreach (var item in history)
-                        {
-                            <li class="list-group-item" @key="item.Id">
-                                <div class="d-flex justify-content-between">
-                                    <span>@item.Prompt</span>
-                                    <button class="btn btn-sm btn-outline-danger"
-                                            @onclick="() => Delete(item.Id)">
-                                        🗑
-                                    </button>
-                                </div>
-
-                                @if (selectedId == item.Id)
-                                {
-                                    <div class="mt-2">
-                                        <p><strong>AI:</strong> @item.AIResponse</p>
-                                        <p><strong>DB:</strong> @item.DBResponse</p>
-                                        <small class="text-muted">@item.CreatedAt.ToLocalTime()</small>
-                                    </div>
-                                }
-                                else
-                                {
-                                    <button class="btn btn-link btn-sm"
-                                            @onclick="() => selectedId = item.Id">
-                                        Details
-                                    </button>
-                                }
-                            </li>
-                        }
-                    </ul>
-                </div>
-            </div>
-        </div>
+  <div class="row">
+    <div class="col-md-6">
+            <ChatInput Prompt="@prompt"
+                       PromptChanged="p => prompt = p"
+                       IsBusy="@isBusy"
+                       HasReachedLimit="@HasReachedDailyLimit"
+                       UserFirstName="@userFirstName"
+                       OnKeyDown="HandleKeyDown"
+                       OnAsk="HandleAsk" />
     </div>
+    <div class="col-md-6">
+      <ChatHistory History="@history"
+                   SelectedId="@selectedId"
+                   OnDelete="Delete"
+                   OnSelect="id => selectedId = id"
+                   ScrollTarget="historyDiv" />
+    </div>
+  </div>
 </div>
 
 @code {
-    private ElementReference historyDiv;
-    private string prompt = "";
-    private bool isBusy;
-    private string? status;
-    private ChatHistoryDTO? lastAnswer;
-    private Guid userId;
-    private string userFirstName = "";
-    private List<ChatHistoryDTO> history = new();
-    private Guid? selectedId;
-   
-    private bool HasReachedDailyLimit =>
-      history.Count(h => h.CreatedAt.Date == DateTime.Today) >= 3;
-
-    protected override async Task OnInitializedAsync()
-    {      
-        var authState = await AuthStateProvider.GetAuthenticationStateAsync();
-        var email = authState.User.Identity?.Name;
-        if (string.IsNullOrEmpty(email)) return;
-
-        var user = await UserService.GetUserByEmailAsync(email);
-        userId = user.Id;
-        userFirstName = user.FirstName;
-     
-        history = (await ChatOrchestrator.GetHistoryAsync(userId)).ToList();
-        await AutoScroll();
-    }
-     
-    private async Task HandleKeyUp(KeyboardEventArgs e)
-    {
-        if (e.Key == "Enter" && !e.ShiftKey)
-        {          
-            await HandleAsk();
-        }
-    }
-
-    private async Task HandleAsk()
-    {
-        if (isBusy || HasReachedDailyLimit || string.IsNullOrWhiteSpace(prompt))
-            return;
-
-        isBusy = true;
-        status = null;
-
-        try
-        {         
-            lastAnswer = await ChatOrchestrator.AskAsync(userId, prompt, persist: true);          
-            history = (await ChatOrchestrator.GetHistoryAsync(userId)).ToList();
-            await AutoScroll();
-
-            status = "gespeichert!";
-            prompt = "";
-        }
-        catch (Exception ex)
-        {
-            status = $"Fehler: {ex.Message}";
-        }
-        finally
-        {
-            isBusy = false;
-        }
-    }
-
-    private async Task Delete(Guid id)
-    {
-        await ChatOrchestrator.DeleteAsync(userId, id);
-        history.RemoveAll(h => h.Id == id);
-        if (selectedId == id) selectedId = null;
-        status = "Eintrag gelöscht.";
-    }
- 
-    private ValueTask AutoScroll() =>
-      JSRuntime.InvokeVoidAsync("scrollToEnd", historyDiv);
+  private ElementReference historyDiv;
 }

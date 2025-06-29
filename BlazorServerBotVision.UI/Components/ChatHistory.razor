@@ -1,0 +1,45 @@
+﻿@using BlazorServerBotVision.Application.DTOs
+@using Microsoft.AspNetCore.Components
+
+<div class="card shadow-sm">
+    <div class="card-body" style="max-height:400px; overflow:auto;" @ref="ScrollTarget">
+        <h5 class="card-title">Historie</h5>
+        <ul class="list-group">
+            @foreach (var item in History)
+            {
+                <li class="list-group-item" @key="item.Id">
+                    <div class="d-flex justify-content-between">
+                        <span>@item.Prompt</span>
+                        <button type="button" class="btn btn-sm btn-outline-danger"
+                                @onclick="() => OnDelete.InvokeAsync(item.Id)">
+                            🗑
+                        </button>
+                    </div>
+                    @if (SelectedId == item.Id)
+                    {
+                        <div class="mt-2">
+                            <p><strong>AI:</strong> @item.AIResponse</p>
+                            <p><strong>DB:</strong> @item.DBResponse</p>
+                            <small class="text-muted">@item.CreatedAt.ToLocalTime()</small>
+                        </div>
+                    }
+                    else
+                    {
+                        <button type="button" class="btn btn-link btn-sm"
+                                @onclick="() => OnSelect.InvokeAsync(item.Id)">
+                            Details
+                        </button>
+                    }
+                </li>
+            }
+        </ul>
+    </div>
+</div>
+
+@code {
+    [Parameter] public List<ChatHistoryDTO> History { get; set; } = new();
+    [Parameter] public Guid? SelectedId { get; set; }
+    [Parameter] public EventCallback<Guid> OnDelete { get; set; }
+    [Parameter] public EventCallback<Guid> OnSelect { get; set; }
+    [Parameter] public ElementReference ScrollTarget { get; set; }
+}
